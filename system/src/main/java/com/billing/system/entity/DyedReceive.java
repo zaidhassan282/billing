@@ -1,14 +1,13 @@
 package com.billing.system.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
-
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 
-@Setter
 @Getter
+@Setter
 @Entity
 public class DyedReceive {
 
@@ -18,7 +17,8 @@ public class DyedReceive {
 
     private LocalDate dated;
 
-    private String inwardGatePassNo;
+    // Source inward gate-pass reference (optional)
+    private String inwardId;
 
     private String contractNo;
 
@@ -32,6 +32,8 @@ public class DyedReceive {
 
     private String quality;
 
+    private String color;
+
     private Double quantityKg;
 
     private Double cutPiecesKg;
@@ -40,6 +42,4 @@ public class DyedReceive {
 
     @Column(unique = true)
     private String newId;
-
-    // getters & setters
 }

@@ -7,8 +7,6 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 @Getter
 @Setter
 @Entity
@@ -19,21 +17,36 @@ public class InwardGatePass {
     private Long id;
 
     @Column(unique = true)
-    private String gatePassNo;
+    private String inwardId; // IGP-xxxxxx
 
-    private LocalDate date;
+    private LocalDate dated;
 
-    // Party Details
+    // Contract & party
+    private String contractNo;
+    private String partyCode;
+    private String nameOfParty;
     private String supplierName;
+
+    // Lot tracking
+    private String customerLotNo;
+    private String factoryLotNo;
+
+    // Logistics
     private String address;
     private String vehicleNo;
     private String driverName;
     private String referenceNo;
 
-    // Fabric Type
-    private String fabricType; // DYED / GREY
+    // Fabric / classification
+    private String fabricType;
+    private Boolean isDyedFabric;
+    private Boolean isGreigeFabric;
 
-    @OneToMany(mappedBy = "inward", cascade = CascadeType.ALL)
+    // Security / gate metadata
+    private String gateTime;
+    private String securityGuardName;
+    private String checkedBy;
+
+    @OneToMany(mappedBy = "inward", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<InwardItem> items;
-
 }

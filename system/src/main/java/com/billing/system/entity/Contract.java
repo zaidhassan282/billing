@@ -1,14 +1,13 @@
 package com.billing.system.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
-
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 
-@Setter
 @Getter
+@Setter
 @Entity
 @Table(name = "contract_table")
 public class Contract {
@@ -27,6 +26,9 @@ public class Contract {
 
     private String gstInvoice;
 
+    // Frontend sends "Yes"/"No" for the GST flag in ContractTable.js
+    private String gstInvoiceYesNo;
+
     private String hsCode;
 
     private String quality;
@@ -35,8 +37,10 @@ public class Contract {
 
     private Double rateA;
 
-    private Double rateB; // 🔥 NEW FIELD
+    private Double rateB;
 
+    // Either field name is accepted from older clients
+    private Double shrinkage;
     private Double shrinkageAllowed;
 
     private String deliveryTime;
@@ -44,5 +48,4 @@ public class Contract {
     private String paymentTerm;
 
     private String remarks;
-
 }

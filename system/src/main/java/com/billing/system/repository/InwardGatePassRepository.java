@@ -7,8 +7,5 @@ import java.util.Optional;
 
 public interface InwardGatePassRepository extends JpaRepository<InwardGatePass, Long> {
 
-    Optional<InwardGatePass> findByInwardId(String inwardId); // 🔥 REQUIRED
-
-    Optional<InwardGatePass> findByGatePassNo(String gatePassNo);
-
+    Optional<InwardGatePass> findByInwardId(String inwardId);
 }

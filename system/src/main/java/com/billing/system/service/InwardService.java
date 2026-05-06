@@ -1,11 +1,13 @@
 package com.billing.system.service;
 
 import com.billing.system.entity.*;
-import com.billing.system.repository.ContractRepository;
-import com.billing.system.repository.InwardGatePassRepository;
-import com.billing.system.repository.InventoryRepository;
+import com.billing.system.enums.FabricStage;
+import com.billing.system.enums.MovementType;
 import com.billing.system.repository.FabricMovementRepository;
+import com.billing.system.repository.InventoryRepository;
+import com.billing.system.repository.InwardGatePassRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,106 +17,97 @@ import java.util.UUID;
 public class InwardService {
 
     private final InwardGatePassRepository inwardRepo;
-    private final ContractRepository contractRepo;
     private final InventoryRepository inventoryRepo;
     private final FabricMovementRepository movementRepo;
 
-    // ✅ Constructor Injection
-    public InwardService(
-            InwardGatePassRepository inwardRepo,
-            ContractRepository contractRepo,
-            InventoryRepository inventoryRepo,
-            FabricMovementRepository movementRepo
-    ) {
+    public InwardService(InwardGatePassRepository inwardRepo,
+                         InventoryRepository inventoryRepo,
+                         FabricMovementRepository movementRepo) {
         this.inwardRepo = inwardRepo;
-        this.contractRepo = contractRepo;
         this.inventoryRepo = inventoryRepo;
         this.movementRepo = movementRepo;
     }
 
-    // ✅ SAVE INWARD
+    @Transactional
     public InwardGatePass save(InwardGatePass inward) {
 
-        // ✅ Gate Pass No
-        if (inward.getGatePassNo() == null || inward.getGatePassNo().isEmpty()) {
-            inward.setGatePassNo("IN-" + UUID.randomUUID().toString().substring(0, 6));
+        if (inward.getInwardId() == null || inward.getInwardId().isEmpty()) {
+            inward.setInwardId("IGP-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase());
         }
 
-        // ✅ Date
-        if (inward.getDate() == null) {
-            inward.setDate(LocalDate.now());
+        if (inward.getDated() == null) {
+            inward.setDated(LocalDate.now());
         }
 
-        // ❌ Prevent null items
         if (inward.getItems() == null || inward.getItems().isEmpty()) {
             throw new RuntimeException("At least one item is required");
         }
 
-        // 🔥 Process Items
         for (InwardItem item : inward.getItems()) {
-
             item.setInward(inward);
 
-            // ❌ Validation
-            if (item.getDescription() == null || item.getDescription().isEmpty()) {
-                throw new RuntimeException("Quality/Description is required");
+            if (item.getQuality() == null || item.getQuality().isEmpty()) {
+                throw new RuntimeException("Quality is required");
             }
-
-            if (item.getWeightKg() == null || item.getWeightKg() <= 0) {
-                throw new RuntimeException("Weight must be greater than 0");
+            if (item.getKg() == null || item.getKg() <= 0) {
+                throw new RuntimeException("Weight (kg) must be greater than 0");
             }
-
-            if (item.getColor() == null) {
-                item.setColor("NA"); // optional fallback
+            if (item.getColor() == null || item.getColor().isEmpty()) {
+                item.setColor("NA");
             }
-
             if (item.getMeters() == null) item.setMeters(0.0);
+            if (item.getRoll() == null) item.setRoll(0);
 
-            // 🔥 INVENTORY LOGIC (MERGE, NOT CREATE ALWAYS)
-            Inventory inv = inventoryRepo
-                    .findByQualityAndColor(item.getDescription(), item.getColor())
-                    .orElse(null);
-
-            if (inv == null) {
-                inv = new Inventory();
-                inv.setQuality(item.getDescription());
-                inv.setColor(item.getColor());
-                inv.setAvailableKg(item.getWeightKg());
-                inv.setAvailableMeters(item.getMeters());
-            } else {
-                inv.setAvailableKg(inv.getAvailableKg() + item.getWeightKg());
-                inv.setAvailableMeters(inv.getAvailableMeters() + item.getMeters());
-            }
-
-            inventoryRepo.save(inv);
-
-            // 🔥 (Optional - keep or remove for now)
-            // FabricMovement tracking (you can comment this if not ready)
-            /*
-            FabricMovement movement = new FabricMovement();
-            movement.setRefId(inward.getGatePassNo());
-            movement.setQuality(item.getDescription());
-            movement.setQuantityKg(item.getWeightKg());
-            movement.setType(MovementType.INWARD);
-            movement.setFromStage(null);
-            movement.setToStage(FabricStage.GREIGH);
-            movement.setDated(LocalDate.now());
-
-            movementRepo.save(movement);
-            */
+            mergeIntoInventory(inward.getInwardId(), item);
+            recordMovement(inward.getInwardId(), item);
         }
 
         return inwardRepo.save(inward);
     }
 
-    // ✅ GET ALL
+    private void mergeIntoInventory(String refId, InwardItem item) {
+        Inventory inv = inventoryRepo
+                .findByQualityAndColorAndStage(item.getQuality(), item.getColor(), FabricStage.GREIGH.name())
+                .orElse(null);
+
+        if (inv == null) {
+            inv = new Inventory();
+            inv.setRefId(refId);
+            inv.setStage(FabricStage.GREIGH.name());
+            inv.setQuality(item.getQuality());
+            inv.setColor(item.getColor());
+            inv.setAvailableKg(item.getKg());
+            inv.setAvailableMeters(item.getMeters());
+        } else {
+            inv.setAvailableKg(safeAdd(inv.getAvailableKg(), item.getKg()));
+            inv.setAvailableMeters(safeAdd(inv.getAvailableMeters(), item.getMeters()));
+        }
+
+        inventoryRepo.save(inv);
+    }
+
+    private void recordMovement(String refId, InwardItem item) {
+        FabricMovement m = new FabricMovement();
+        m.setRefId(refId);
+        m.setQuality(item.getQuality());
+        m.setQuantityKg(item.getKg());
+        m.setType(MovementType.INWARD);
+        m.setFromStage(null);
+        m.setToStage(FabricStage.GREIGH);
+        m.setDated(LocalDate.now());
+        movementRepo.save(m);
+    }
+
+    private static double safeAdd(Double a, Double b) {
+        return (a == null ? 0.0 : a) + (b == null ? 0.0 : b);
+    }
+
     public List<InwardGatePass> getAll() {
         return inwardRepo.findAll();
     }
 
-    // ✅ GET BY GATE PASS NO (UPDATED)
-    public InwardGatePass getByGatePassNo(String gatePassNo) {
-        return inwardRepo.findByGatePassNo(gatePassNo)
-                .orElseThrow(() -> new RuntimeException("Inward not found: " + gatePassNo));
+    public InwardGatePass getByInwardId(String inwardId) {
+        return inwardRepo.findByInwardId(inwardId)
+                .orElseThrow(() -> new RuntimeException("Inward not found: " + inwardId));
     }
 }

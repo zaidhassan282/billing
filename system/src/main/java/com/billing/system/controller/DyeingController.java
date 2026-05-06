@@ -1,13 +1,15 @@
 package com.billing.system.controller;
 
-
 import com.billing.system.dto.IssueRequest;
 import com.billing.system.entity.IssueToDyeing;
 import com.billing.system.service.IssueToDyeingService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/dyeing")
+@CrossOrigin
 public class DyeingController {
 
     private final IssueToDyeingService service;
@@ -22,7 +24,12 @@ public class DyeingController {
                 req.getQuality(),
                 req.getColor(),
                 req.getQtyKg(),
-                req.getInwardGatePassNo()
+                req.resolveInwardRef()
         );
+    }
+
+    @GetMapping("/issues")
+    public List<IssueToDyeing> getAll() {
+        return service.getAll();
     }
 }

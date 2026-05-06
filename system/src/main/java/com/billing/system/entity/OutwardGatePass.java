@@ -1,15 +1,11 @@
 package com.billing.system.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
-
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
-import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,18 +17,37 @@ public class OutwardGatePass {
     private Long id;
 
     @Column(unique = true)
-    private String gatePassNo;
+    private String outwardId; // OGP-xxxxxx
 
-    private LocalDate date;
+    private LocalDate dated;
 
+    // Reference to source inward (optional)
+    private String inwardId;
+
+    private String contractNo;
+    private String customerCode;
     private String customerName;
+
+    // Lot tracking
+    private String customerLotNo;
+    private String factoryLotNo;
+
+    // ISSUE / RETURN
+    private String type;
+
+    // Logistics
     private String address;
     private String vehicleNo;
     private String driverName;
     private String referenceNo;
 
-    private String fabricType; // DYED / GREY
+    private String fabricType;
 
-    @OneToMany(mappedBy = "outward", cascade = CascadeType.ALL)
+    // Security / gate metadata
+    private String gateTime;
+    private String securityGuardName;
+    private String checkedBy;
+
+    @OneToMany(mappedBy = "outward", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OutwardItem> items;
 }

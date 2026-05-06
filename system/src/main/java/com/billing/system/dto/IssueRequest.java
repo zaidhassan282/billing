@@ -1,41 +1,21 @@
 package com.billing.system.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class IssueRequest {
 
+    // Frontend sends `inwardId`; older callers may send `inwardGatePassNo`.
+    private String inwardId;
     private String inwardGatePassNo;
+
     private String quality;
     private String color;
     private Double qtyKg;
 
-    public String getInwardGatePassNo() {
-        return inwardGatePassNo;
-    }
-
-    public void setInwardGatePassNo(String inwardGatePassNo) {
-        this.inwardGatePassNo = inwardGatePassNo;
-    }
-
-    public String getQuality() {
-        return quality;
-    }
-
-    public void setQuality(String quality) {
-        this.quality = quality;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
-    public Double getQtyKg() {
-        return qtyKg;
-    }
-
-    public void setQtyKg(Double qtyKg) {
-        this.qtyKg = qtyKg;
+    public String resolveInwardRef() {
+        return inwardId != null && !inwardId.isEmpty() ? inwardId : inwardGatePassNo;
     }
 }

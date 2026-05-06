@@ -4,8 +4,10 @@ import com.billing.system.entity.InwardGatePass;
 import com.billing.system.service.InwardService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/inward") // 🔥 THIS IS IMPORTANT
+@RequestMapping("/inward")
 @CrossOrigin
 public class InwardController {
 
@@ -15,15 +17,24 @@ public class InwardController {
         this.inwardService = inwardService;
     }
 
-    // ✅ SAVE INWARD
     @PostMapping
     public InwardGatePass save(@RequestBody InwardGatePass inward) {
         return inwardService.save(inward);
     }
 
-    // ✅ GET ALL
+    // Alias used by GatePass.js
+    @PostMapping("/save")
+    public InwardGatePass saveAlias(@RequestBody InwardGatePass inward) {
+        return inwardService.save(inward);
+    }
+
     @GetMapping
-    public Object getAll() {
+    public List<InwardGatePass> getAll() {
         return inwardService.getAll();
+    }
+
+    @GetMapping("/{inwardId}")
+    public InwardGatePass getOne(@PathVariable String inwardId) {
+        return inwardService.getByInwardId(inwardId);
     }
 }

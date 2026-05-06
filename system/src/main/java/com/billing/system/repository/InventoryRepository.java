@@ -3,15 +3,14 @@ package com.billing.system.repository;
 import com.billing.system.entity.Inventory;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 
 public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
-    List<Inventory> findByInwardId(String inwardId);
+    Optional<Inventory> findByQualityAndColorAndStage(String quality, String color, String stage);
 
-    Optional<Inventory> findByInwardIdAndQuality(String inwardId, String quality);
+    List<Inventory> findByQualityAndStage(String quality, String stage);
 
-    Optional<Inventory> findByQualityAndColor(String quality, String color);
-
+    List<Inventory> findByStage(String stage);
 }

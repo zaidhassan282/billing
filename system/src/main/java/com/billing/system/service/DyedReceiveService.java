@@ -1,16 +1,15 @@
 package com.billing.system.service;
 
-
-import com.billing.system.dto.IssueRequest;
 import com.billing.system.entity.DyedReceive;
-import com.billing.system.entity.Inventory;
 import com.billing.system.entity.FabricMovement;
+import com.billing.system.entity.Inventory;
 import com.billing.system.enums.FabricStage;
 import com.billing.system.enums.MovementType;
 import com.billing.system.repository.DyedReceiveRepository;
-import com.billing.system.repository.InventoryRepository;
 import com.billing.system.repository.FabricMovementRepository;
+import com.billing.system.repository.InventoryRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -22,44 +21,64 @@ public class DyedReceiveService {
     private final InventoryRepository inventoryRepo;
     private final FabricMovementRepository movementRepo;
 
-    public DyedReceiveService(
-            DyedReceiveRepository dyedRepo,
-            InventoryRepository inventoryRepo,
-            FabricMovementRepository movementRepo
-    ) {
+    public DyedReceiveService(DyedReceiveRepository dyedRepo,
+                              InventoryRepository inventoryRepo,
+                              FabricMovementRepository movementRepo) {
         this.dyedRepo = dyedRepo;
         this.inventoryRepo = inventoryRepo;
         this.movementRepo = movementRepo;
     }
 
+    @Transactional
     public DyedReceive save(DyedReceive receive) {
 
-        // 🔥 Auto ID
-        receive.setNewId("DR-" + UUID.randomUUID().toString().substring(0, 6));
+        if (receive.getQuality() == null || receive.getQuality().isEmpty()) {
+            throw new RuntimeException("Quality is required");
+        }
+        if (receive.getQuantityKg() == null || receive.getQuantityKg() <= 0) {
+            throw new RuntimeException("Quantity (kg) must be greater than 0");
+        }
 
-        // 🔥 Date
+        if (receive.getColor() == null || receive.getColor().isEmpty()) {
+            receive.setColor("NA");
+        }
+
+        receive.setNewId("DR-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase());
+
         if (receive.getDated() == null) {
             receive.setDated(LocalDate.now());
         }
 
-        // 🔥 ADD TO INVENTORY
-        Inventory inv = new Inventory();
-        inv.setGatePassNo(receive.getContractNo()); // ✅ FIXED
-        inv.setQuality(receive.getQuality());
-        inv.setAvailableKg(receive.getQuantityKg());
+        // Net dyed quantity = received - cut pieces - shrinkage
+        double cut = receive.getCutPiecesKg() == null ? 0.0 : receive.getCutPiecesKg();
+        double shrink = receive.getShrinkage() == null ? 0.0 : receive.getShrinkage();
+        double netKg = Math.max(0.0, receive.getQuantityKg() - cut - shrink);
 
+        Inventory inv = inventoryRepo
+                .findByQualityAndColorAndStage(receive.getQuality(), receive.getColor(), FabricStage.DYED.name())
+                .orElse(null);
+
+        if (inv == null) {
+            inv = new Inventory();
+            inv.setRefId(receive.getNewId());
+            inv.setStage(FabricStage.DYED.name());
+            inv.setQuality(receive.getQuality());
+            inv.setColor(receive.getColor());
+            inv.setAvailableKg(netKg);
+            inv.setAvailableMeters(0.0);
+        } else {
+            inv.setAvailableKg((inv.getAvailableKg() == null ? 0.0 : inv.getAvailableKg()) + netKg);
+        }
         inventoryRepo.save(inv);
 
-        // 🔥 TRACK MOVEMENT
         FabricMovement m = new FabricMovement();
         m.setRefId(receive.getNewId());
         m.setQuality(receive.getQuality());
-        m.setQuantityKg(receive.getQuantityKg());
+        m.setQuantityKg(netKg);
         m.setType(MovementType.RECEIVED_DYED);
         m.setFromStage(FabricStage.DYEING);
         m.setToStage(FabricStage.DYED);
         m.setDated(LocalDate.now());
-
         movementRepo.save(m);
 
         return dyedRepo.save(receive);

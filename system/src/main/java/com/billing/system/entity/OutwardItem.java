@@ -1,14 +1,12 @@
 package com.billing.system.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-
 import lombok.Getter;
 import lombok.Setter;
 
-
-@Setter
 @Getter
+@Setter
 @Entity
 public class OutwardItem {
 
@@ -16,13 +14,18 @@ public class OutwardItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String description;
+    private String quality;
     private String color;
-    private Double weightKg;
-    private Double meters;
+    private String design;
+    private String article;
 
+    private Integer roll;
+    private Double kg;
+    private Double meters;
+    private String remarks;
+
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "outward_id")
     private OutwardGatePass outward;
-
 }

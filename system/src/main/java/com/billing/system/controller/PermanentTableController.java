@@ -1,5 +1,6 @@
 package com.billing.system.controller;
 
+import com.billing.system.entity.PermanentTable;
 import com.billing.system.repository.PermanentTableRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

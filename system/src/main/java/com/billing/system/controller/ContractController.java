@@ -1,6 +1,7 @@
 package com.billing.system.controller;
 
 import com.billing.system.entity.Contract;
+import com.billing.system.entity.PermanentTable;
 import com.billing.system.repository.ContractRepository;
 import com.billing.system.repository.PermanentTableRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,26 +20,33 @@ public class ContractController {
     @Autowired
     private PermanentTableRepository permanentRepo;
 
-    // 🔹 GET ALL
     @GetMapping
     public List<Contract> getAll() {
         return contractRepo.findAll();
     }
 
-    // 🔹 SAVE CONTRACT
+    // Alias used by InwardGatePassForm.js
+    @GetMapping("/all")
+    public List<Contract> getAllAlias() {
+        return contractRepo.findAll();
+    }
+
     @PostMapping
     public Contract save(@RequestBody Contract contract) {
         return contractRepo.save(contract);
     }
 
-    // 🔥 AUTO-FILL BY NAME
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        contractRepo.deleteById(id);
+    }
+
     @GetMapping("/autofill/name")
     public PermanentTable autofillByName(@RequestParam String name) {
         return permanentRepo.findByNameOfParty(name)
                 .orElseThrow(() -> new RuntimeException("Party not found"));
     }
 
-    // 🔥 AUTO-FILL BY CODE
     @GetMapping("/autofill/code")
     public PermanentTable autofillByCode(@RequestParam String code) {
         return permanentRepo.findByPartyCodeContainingIgnoreCase(code)

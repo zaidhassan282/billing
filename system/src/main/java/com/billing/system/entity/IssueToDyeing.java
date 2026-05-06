@@ -1,13 +1,13 @@
 package com.billing.system.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
-
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter
+import java.time.LocalDate;
+
 @Getter
+@Setter
 @Entity
 public class IssueToDyeing {
 
@@ -15,9 +15,10 @@ public class IssueToDyeing {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String issueId; // DY-xxxx
+    @Column(unique = true)
+    private String issueId; // DY-xxxxxx
 
-    private String inwardGatePassNo;
+    private String inwardId;
 
     private String quality;
 
@@ -26,6 +27,4 @@ public class IssueToDyeing {
     private Double quantityKg;
 
     private LocalDate date;
-
-
 }
