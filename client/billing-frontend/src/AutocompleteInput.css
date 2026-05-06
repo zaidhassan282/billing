@@ -1,0 +1,103 @@
+.autocomplete-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.autocomplete-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #d0d8e0;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.autocomplete-input:focus {
+  outline: none;
+  border-color: #667eea;
+  background-color: #f0f4ff;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.autocomplete-input::placeholder {
+  color: #a0aec0;
+}
+
+.autocomplete-dropdown-fixed {
+  position: fixed;
+  background: white;
+  border: 1px solid #d0d8e0;
+  border-radius: 0 0 4px 4px;
+  max-height: 250px;
+  overflow-y: auto;
+  z-index: 10000;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* When dropdown appears below input */
+.autocomplete-dropdown-fixed.below {
+  border-radius: 0 0 4px 4px;
+  border-top: none;
+  margin-top: -1px;
+}
+
+/* When dropdown appears above input */
+.autocomplete-dropdown-fixed.above {
+  border-radius: 4px 4px 0 0;
+  border-bottom: none;
+  margin-bottom: -1px;
+}
+
+.autocomplete-option {
+  padding: 10px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.autocomplete-option:last-child {
+  border-bottom: none;
+}
+
+.autocomplete-option:hover,
+.autocomplete-option.highlighted {
+  background-color: #f0f4ff;
+  color: #667eea;
+  font-weight: 500;
+}
+
+.option-text {
+  width: 100%;
+  color: #2c3e50;
+}
+
+.autocomplete-no-results {
+  padding: 12px;
+  text-align: center;
+  color: #a0aec0;
+  font-size: 13px;
+  font-style: italic;
+}
+
+/* Scrollbar styling */
+.autocomplete-dropdown-fixed::-webkit-scrollbar {
+  width: 6px;
+}
+
+.autocomplete-dropdown-fixed::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.autocomplete-dropdown-fixed::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+.autocomplete-dropdown-fixed::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
