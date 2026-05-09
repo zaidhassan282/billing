@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./ContractTable.css";
 import AutocompleteInput from "./AutocompleteInput";
 import Toast from "./Toast";
+import { API_URL } from "./config";
 
 function ContractsTable() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [data, setData] = useState([]);
   const [deletedStack, setDeletedStack] = useState([]);
 
@@ -13,11 +17,20 @@ function ContractsTable() {
   const [permanentTableNames, setPermanentTableNames] = useState([]);
   const [toast, setToast] = useState(null);
 
+  // 🔹 Show toast if redirected from AddContract after successful save
+  useEffect(() => {
+    if (location.state && location.state.toast) {
+      setToast(location.state.toast);
+      // clear the state so toast doesn't repeat on refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
+
   // FETCH PERMANENT TABLE DATA (full records, not just names)
   useEffect(() => {
     const fetchPermanentTableData = async () => {
       try {
-        const response = await fetch("http://localhost:8080/permanent-table");
+        const response = await fetch(`${API_URL}/permanent-table`);
         if (response.ok) {
           const permanentData = await response.json();
           // Store full permanent table data for autocomplete and data population
@@ -107,7 +120,7 @@ function ContractsTable() {
         return;
       }
 
-      await fetch("http://localhost:8080/contracts-table", {
+      await fetch(`${API_URL}/contracts-table`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -148,7 +161,7 @@ function ContractsTable() {
         </div>
 
         <div className="header-buttons">
-          <button onClick={addRow} className="btn-add-row">
+          <button onClick={() => navigate("/add-contract")} className="btn-add-row">
             <span>+</span> Add New Contract
           </button>
 

@@ -1,0 +1,579 @@
+/* OUTWARD GATE PASS — Green Theme */
+
+.ogp-wrapper {
+  background: linear-gradient(135deg, #232f3e 0%, #111111 100%);
+  min-height: 100vh;
+  padding: 30px 20px;
+  font-family: 'Segoe UI', 'Roboto', sans-serif;
+}
+
+/* ACTION BUTTONS BAR */
+.ogp-actions {
+  max-width: 1100px;
+  margin: 0 auto 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.ogp-btn {
+  padding: 10px 22px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  color: white;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.ogp-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+}
+
+.ogp-btn-save {
+  background: linear-gradient(135deg, #15803d 0%, #22c55e 100%);
+}
+
+.ogp-btn-print {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.ogp-btn-pdf {
+  background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+}
+
+/* DOCUMENT */
+.ogp-doc {
+  max-width: 1100px;
+  margin: 0 auto;
+  background: white;
+  padding: 25px 30px;
+  color: #1f2937;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  font-size: 12px;
+}
+
+/* HEADER */
+.ogp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 8px;
+  margin-bottom: 0;
+}
+
+.ogp-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ogp-logo-placeholder {
+  width: 75px;
+  height: 75px;
+  border: 2px dashed #15803d;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f0fdf4;
+  position: relative;
+}
+
+.ogp-logo-text {
+  font-size: 8px;
+  font-weight: 800;
+  color: #15803d;
+  text-align: center;
+  line-height: 1.1;
+  letter-spacing: 0.3px;
+}
+
+.ogp-logo-hint {
+  position: absolute;
+  bottom: 2px;
+  font-size: 7px;
+  color: #999;
+  font-style: italic;
+}
+
+.ogp-company-name {
+  font-size: 14px;
+  font-weight: 800;
+  color: #15803d;
+  letter-spacing: 0.5px;
+}
+
+.ogp-header-right {
+  text-align: right;
+}
+
+.ogp-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: #15803d;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+/* ADDRESS BAR */
+.ogp-address-bar {
+  border-top: 2px solid #15803d;
+  border-bottom: 2px solid #15803d;
+  padding: 6px 10px;
+  text-align: center;
+  font-size: 11px;
+  color: #1f2937;
+  font-weight: 500;
+}
+
+/* PASS TYPE ROW (DELIVERY / RETURN selectable) */
+.ogp-type-row {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid #15803d;
+  border-top: none;
+  background: #f0fdf4;
+}
+
+.ogp-type-label {
+  width: 150px;
+  background: #15803d;
+  color: white;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  border-right: 1px solid #15803d;
+}
+
+/* TOP FIELDS (GATE PASS NO. + DATE) */
+.ogp-top-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid #15803d;
+  border-top: none;
+}
+
+.ogp-top-field {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  border-right: 1px solid #15803d;
+}
+
+.ogp-top-field:last-child {
+  border-right: none;
+}
+
+.ogp-top-label {
+  background: #15803d;
+  color: white;
+  padding: 10px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+}
+
+.ogp-top-input {
+  border: none;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background: white;
+  outline: none;
+  color: #1f2937;
+}
+
+/* SECTION HEADERS */
+.ogp-section-header {
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: white;
+}
+
+.ogp-section-dark {
+  background: #1f2937;
+}
+
+.ogp-section-green {
+  background: #15803d;
+}
+
+/* SECTION BODY */
+.ogp-section-body {
+  border: 1px solid #1f2937;
+  border-top: none;
+}
+
+.ogp-row {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  border-bottom: 1px solid #d1d5db;
+}
+
+.ogp-row:last-child {
+  border-bottom: none;
+}
+
+.ogp-row-label {
+  background: #1f2937;
+  color: white;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  border-right: 1px solid #1f2937;
+  display: flex;
+  align-items: center;
+}
+
+.ogp-row-input {
+  border: none;
+  padding: 8px 12px;
+  font-size: 12px;
+  background: #f9fafb;
+  outline: none;
+  width: 100%;
+  color: #1f2937;
+}
+
+.ogp-row-input:focus {
+  background: #fffbeb;
+}
+
+/* FABRIC TYPE ROW */
+.ogp-fabric-type-row {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid #15803d;
+  border-top: none;
+  background: #f9fafb;
+}
+
+.ogp-fabric-type-label {
+  width: 250px;
+  background: #1f2937;
+  color: white;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  border-right: 1px solid #1f2937;
+  display: flex;
+  align-items: center;
+}
+
+/* RADIO STYLE */
+.ogp-radio-label {
+  display: flex;
+  align-items: center;
+  padding: 8px 20px;
+  font-size: 11px;
+  cursor: pointer;
+  gap: 8px;
+  color: #1f2937;
+  transition: background 0.2s ease;
+  border-right: 1px solid #d1d5db;
+}
+
+.ogp-radio-label:hover {
+  background: #dcfce7;
+}
+
+.ogp-radio-label.active {
+  background: #bbf7d0;
+  color: #15803d;
+}
+
+.ogp-radio-label input[type="radio"] {
+  display: none;
+}
+
+.ogp-radio-custom {
+  width: 14px;
+  height: 14px;
+  border: 2px solid #15803d;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.ogp-radio-label.active .ogp-radio-custom::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #15803d;
+}
+
+/* ITEMS TABLE */
+.ogp-items-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.ogp-items-table thead {
+  background: #1f2937;
+  color: white;
+}
+
+.ogp-items-table thead th {
+  padding: 8px 6px;
+  font-size: 10px;
+  font-weight: 700;
+  text-align: center;
+  border: 1px solid #1f2937;
+  letter-spacing: 0.3px;
+}
+
+.ogp-col-no {
+  width: 30px;
+}
+
+.ogp-items-table tbody tr {
+  background: white;
+}
+
+.ogp-items-table tbody tr:nth-child(even) {
+  background: #f9fafb;
+}
+
+.ogp-items-table tbody td {
+  border: 1px solid #d1d5db;
+  padding: 0;
+  height: 26px;
+}
+
+.ogp-items-table tbody td.ogp-col-no {
+  text-align: center;
+  font-weight: 600;
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+.ogp-cell-input {
+  width: 100%;
+  height: 100%;
+  border: none;
+  padding: 4px 6px;
+  font-size: 11px;
+  background: transparent;
+  outline: none;
+  font-family: inherit;
+  color: #1f2937;
+}
+
+.ogp-cell-input:focus {
+  background: #fffbeb;
+}
+
+.ogp-cell-number {
+  text-align: center;
+}
+
+/* TOTAL ROW */
+.ogp-total-row {
+  background: #1f2937 !important;
+}
+
+.ogp-total-label {
+  text-align: right;
+  padding: 8px 12px !important;
+  font-size: 11px;
+  font-weight: 700;
+  color: white !important;
+  letter-spacing: 0.5px;
+  background: #1f2937 !important;
+}
+
+.ogp-total-value {
+  text-align: center;
+  padding: 8px 6px !important;
+  font-size: 11px;
+  font-weight: 700;
+  color: white !important;
+  background: #1f2937 !important;
+}
+
+/* SIGNATURES */
+.ogp-signatures {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border: 1px solid #15803d;
+  border-top: none;
+}
+
+.ogp-signature-col {
+  border-right: 1px solid #15803d;
+}
+
+.ogp-signature-col:last-child {
+  border-right: none;
+}
+
+.ogp-signature-header {
+  background: #15803d;
+  color: white;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+.ogp-signature-body {
+  padding: 12px;
+  background: white;
+  min-height: 100px;
+}
+
+.ogp-sig-line {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 6px;
+}
+
+.ogp-sig-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #4b5563;
+  white-space: nowrap;
+}
+
+.ogp-sig-input {
+  flex: 1;
+  border: none;
+  border-bottom: 1px solid #9ca3af;
+  padding: 2px 4px;
+  font-size: 11px;
+  outline: none;
+  background: transparent;
+  color: #1f2937;
+}
+
+.ogp-sig-input:focus {
+  border-bottom-color: #15803d;
+}
+
+/* FOOTER NOTE */
+.ogp-footer-note {
+  background: #1f2937;
+  color: white;
+  padding: 8px 12px;
+  text-align: center;
+  font-size: 10px;
+  font-style: italic;
+  letter-spacing: 0.3px;
+}
+
+/* ============================================ */
+/* PRINT STYLES — KEEP DESIGN EXACTLY THE SAME  */
+/* ============================================ */
+@media print {
+  /* Force colors to print (Chrome/Safari) */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* Strip body & wrapper background only */
+  body {
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .ogp-wrapper {
+    background: white !important;
+    padding: 0 !important;
+    min-height: auto !important;
+  }
+
+  /* Hide action buttons only */
+  .ogp-actions {
+    display: none !important;
+  }
+
+  /* Document keeps its visible style */
+  .ogp-doc {
+    box-shadow: none !important;
+    margin: 0 auto !important;
+    /* keep padding, max-width, font-size — DO NOT CHANGE */
+  }
+
+  /* Inputs render with their values, no focus outlines */
+  .ogp-cell-input,
+  .ogp-row-input,
+  .ogp-top-input,
+  .ogp-sig-input {
+    background: transparent !important;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 8mm;
+  }
+}
+
+/* RESPONSIVE — Only screen, doesn't affect print */
+@media screen and (max-width: 900px) {
+  .ogp-doc {
+    padding: 15px;
+    font-size: 10px;
+  }
+
+  .ogp-title {
+    font-size: 20px;
+  }
+
+  .ogp-row {
+    grid-template-columns: 150px 1fr;
+  }
+
+  .ogp-row-label,
+  .ogp-fabric-type-label {
+    font-size: 10px;
+    padding: 6px 8px;
+  }
+
+  .ogp-fabric-type-label {
+    width: 150px;
+  }
+
+  .ogp-items-table {
+    font-size: 9px;
+  }
+
+  .ogp-items-table thead th {
+    font-size: 9px;
+    padding: 6px 3px;
+  }
+
+  .ogp-signatures {
+    grid-template-columns: 1fr;
+  }
+
+  .ogp-signature-col {
+    border-right: none;
+    border-bottom: 1px solid #15803d;
+  }
+}

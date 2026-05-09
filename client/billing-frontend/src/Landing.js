@@ -34,12 +34,6 @@ function Landing() {
           <div className="cards-grid">
 
             <Card
-              icon="➕"
-              title="Add Party"
-              description="Add new party to permanent table"
-              onClick={() => navigate("/add-party")}
-            />
-            <Card
               icon="📑"
               title="Permanent Table"
               description="Permanent entries and records"
@@ -50,12 +44,6 @@ function Landing() {
               title="Invoice"
               description="Create and manage invoices"
               onClick={() => navigate("/invoice")}
-            />
-            <Card
-              icon="📋"
-              title="Contract"
-              description="Create and manage contracts"
-              onClick={() => navigate("/contract")}
             />
             <Card
               icon="📊"

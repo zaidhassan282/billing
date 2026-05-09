@@ -102,6 +102,100 @@
   transform: scale(1.05);
 }
 
+.btn-edit {
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-right: 6px;
+}
+
+.btn-edit:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(102, 126, 234, 0.4);
+}
+
+.btn-save-row {
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #52c41a 0%, #52b969 100%);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-right: 6px;
+}
+
+.btn-save-row:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(82, 196, 26, 0.4);
+}
+
+.btn-undo:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-undo:disabled:hover {
+  transform: none;
+  box-shadow: 0 2px 8px rgba(250, 173, 20, 0.3);
+}
+
+/* ACTIONS COLUMN */
+.actions-cell {
+  white-space: nowrap;
+  display: flex;
+  gap: 4px;
+}
+
+/* PARTY ID CELL (auto-generated, readonly) */
+.party-id-cell {
+  background-color: #eef2ff !important;
+  font-weight: 700 !important;
+  color: #1e3a8a !important;
+  letter-spacing: 0.5px;
+  text-align: center;
+  cursor: not-allowed;
+}
+
+/* ROW STATES */
+.permanent-table tbody tr.row-editing {
+  background-color: #fffbeb;
+}
+
+.permanent-table tbody tr.row-editing:hover {
+  background-color: #fef3c7;
+}
+
+.permanent-table tbody tr.row-view input[readonly],
+.permanent-table tbody tr.row-view input[type="text"][readonly] {
+  background-color: #f9fafb;
+  border-color: transparent;
+  cursor: default;
+  color: #2c3e50;
+}
+
+.permanent-table tbody tr.row-view input[readonly]:focus {
+  background-color: #f9fafb;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+/* Editing-mode inputs slightly highlighted */
+.permanent-table tbody tr.row-editing input[type="text"]:not([readonly]),
+.permanent-table tbody tr.row-editing select {
+  background-color: white;
+  border-color: #fbbf24;
+}
+
 /* TABLE CONTROLS */
 .table-controls {
   display: flex;

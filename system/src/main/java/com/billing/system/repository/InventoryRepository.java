@@ -8,9 +8,12 @@ import java.util.Optional;
 
 public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
-    Optional<Inventory> findByQualityAndColorAndStage(String quality, String color, String stage);
+    Optional<Inventory> findByContractNoAndQualityAndColorAndStage(
+            String contractNo, String quality, String color, String stage);
 
-    List<Inventory> findByQualityAndStage(String quality, String stage);
+    List<Inventory> findByContractNoAndStage(String contractNo, String stage);
+
+    List<Inventory> findByContractNo(String contractNo);
 
     List<Inventory> findByStage(String stage);
 }

@@ -1,0 +1,31 @@
+# Render Blueprint — connect this repo on render.com to auto-create both
+# the backend service and a Postgres database.
+#
+# After Render creates the resources, set these env vars on the web service:
+#   DB_URL              jdbc:postgresql://<host>/<db>?sslmode=require
+#   DB_USERNAME         <user from the Postgres tab>
+#   DB_PASSWORD         <password from the Postgres tab>
+#   CORS_ALLOWED_ORIGINS  https://your-frontend.vercel.app
+
+services:
+  - type: web
+    name: billing-backend
+    runtime: docker
+    plan: free
+    rootDir: system
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+
+databases:
+  - name: billing-db
+    plan: free
+    databaseName: billing
+    user: billing

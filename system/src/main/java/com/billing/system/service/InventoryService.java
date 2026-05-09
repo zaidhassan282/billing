@@ -16,53 +16,27 @@ public class InventoryService {
     }
 
     @Transactional
-    public void issueStock(String quality, String color, Double qty) {
-        if (quality == null || quality.isEmpty()) {
-            throw new RuntimeException("Quality is required");
-        }
-        if (qty == null || qty <= 0) {
+    public void issueStock(String contractNo, String quality, String color, Double qtyKg) {
+        require(contractNo, "contractNo");
+        require(quality, "quality");
+        if (qtyKg == null || qtyKg <= 0) {
             throw new RuntimeException("Quantity must be greater than 0");
         }
-        String resolvedColor = (color == null || color.isEmpty()) ? "NA" : color;
+        String c = (color == null || color.isEmpty()) ? "NA" : color;
 
         Inventory inv = inventoryRepo
-                .findByQualityAndColorAndStage(quality, resolvedColor, FabricStage.GREIGH.name())
+                .findByContractNoAndQualityAndColorAndStage(contractNo, quality, c, FabricStage.GREIGH.name())
                 .orElseThrow(() -> new RuntimeException(
-                        "Greige stock not found for " + quality + " - " + resolvedColor));
+                        "No greige stock for contract " + contractNo + " — " + quality + " / " + c));
 
-        if (inv.getAvailableKg() == null || inv.getAvailableKg() < qty) {
+        if (inv.getAvailableKg() == null || inv.getAvailableKg() < qtyKg) {
             throw new RuntimeException("Not enough stock. Available: " + inv.getAvailableKg());
         }
-
-        inv.setAvailableKg(inv.getAvailableKg() - qty);
+        inv.setAvailableKg(inv.getAvailableKg() - qtyKg);
         inventoryRepo.save(inv);
     }
 
-    @Transactional
-    public void returnStock(String quality, String color, Double qty) {
-        if (quality == null || quality.isEmpty()) {
-            throw new RuntimeException("Quality is required");
-        }
-        if (qty == null || qty <= 0) {
-            throw new RuntimeException("Quantity must be greater than 0");
-        }
-        String resolvedColor = (color == null || color.isEmpty()) ? "NA" : color;
-
-        Inventory inv = inventoryRepo
-                .findByQualityAndColorAndStage(quality, resolvedColor, FabricStage.GREIGH.name())
-                .orElse(null);
-
-        if (inv == null) {
-            inv = new Inventory();
-            inv.setStage(FabricStage.GREIGH.name());
-            inv.setQuality(quality);
-            inv.setColor(resolvedColor);
-            inv.setAvailableKg(qty);
-            inv.setAvailableMeters(0.0);
-        } else {
-            inv.setAvailableKg((inv.getAvailableKg() == null ? 0.0 : inv.getAvailableKg()) + qty);
-        }
-
-        inventoryRepo.save(inv);
+    private static void require(String s, String name) {
+        if (s == null || s.isEmpty()) throw new RuntimeException(name + " is required");
     }
 }

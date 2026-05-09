@@ -3,16 +3,17 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import Toast from "./Toast";
 import "./GatePass.css";
+import { API_URL } from "./config";
 
 const getListEndpoint = (type) =>
     type === "inward"
-        ? "http://localhost:8080/inward"
-        : "http://localhost:8080/outward";
+        ? `${API_URL}/inward`
+        : `${API_URL}/outward`;
 
 const getSaveEndpoint = (type) =>
     type === "inward"
-        ? "http://localhost:8080/inward/save"
-        : "http://localhost:8080/outward/save";
+        ? `${API_URL}/inward/save`
+        : `${API_URL}/outward/save`;
 
 const getGatePassNumber = (gatepass) =>
     gatepass?.inwardId || gatepass?.outwardId || "";

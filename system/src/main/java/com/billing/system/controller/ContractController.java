@@ -4,7 +4,7 @@ import com.billing.system.entity.Contract;
 import com.billing.system.entity.PermanentTable;
 import com.billing.system.repository.ContractRepository;
 import com.billing.system.repository.PermanentTableRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.billing.system.service.AuditService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,18 +14,25 @@ import java.util.List;
 @RequestMapping("/contracts")
 public class ContractController {
 
-    @Autowired
-    private ContractRepository contractRepo;
+    private static final String ENTITY = "Contract";
 
-    @Autowired
-    private PermanentTableRepository permanentRepo;
+    private final ContractRepository contractRepo;
+    private final PermanentTableRepository permanentRepo;
+    private final AuditService audit;
+
+    public ContractController(ContractRepository contractRepo,
+                              PermanentTableRepository permanentRepo,
+                              AuditService audit) {
+        this.contractRepo = contractRepo;
+        this.permanentRepo = permanentRepo;
+        this.audit = audit;
+    }
 
     @GetMapping
     public List<Contract> getAll() {
         return contractRepo.findAll();
     }
 
-    // Alias used by InwardGatePassForm.js
     @GetMapping("/all")
     public List<Contract> getAllAlias() {
         return contractRepo.findAll();
@@ -33,12 +40,34 @@ public class ContractController {
 
     @PostMapping
     public Contract save(@RequestBody Contract contract) {
-        return contractRepo.save(contract);
+        boolean isUpdate = contract.getId() != null;
+        Object before = isUpdate
+                ? audit.snapshot(contractRepo.findById(contract.getId()).orElse(null))
+                : null;
+
+        Contract saved = contractRepo.save(contract);
+        String id = String.valueOf(saved.getId());
+        String biz = saved.getContractNo();
+
+        if (isUpdate && before != null) {
+            audit.logUpdate(ENTITY, id, biz, before, saved,
+                    "Contract " + biz + " updated");
+        } else {
+            audit.logCreate(ENTITY, id, biz, saved,
+                    "Contract " + biz + " created");
+        }
+        return saved;
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
+        Contract existing = contractRepo.findById(id).orElse(null);
+        Object before = audit.snapshot(existing);
         contractRepo.deleteById(id);
+        if (existing != null) {
+            audit.logDelete(ENTITY, String.valueOf(id), existing.getContractNo(), before,
+                    "Contract " + existing.getContractNo() + " deleted");
+        }
     }
 
     @GetMapping("/autofill/name")

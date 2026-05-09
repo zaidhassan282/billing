@@ -17,15 +17,19 @@ import java.util.UUID;
 public class OutwardGatePassService {
 
     private static final String TYPE_ISSUE = "ISSUE";
+    private static final String TYPE_DELIVERY = "DELIVERY";
     private static final String TYPE_RETURN = "RETURN";
 
     private final OutwardGatePassRepository outwardRepo;
     private final InventoryRepository inventoryRepo;
+    private final AuditService audit;
 
     public OutwardGatePassService(OutwardGatePassRepository outwardRepo,
-                                  InventoryRepository inventoryRepo) {
+                                  InventoryRepository inventoryRepo,
+                                  AuditService audit) {
         this.outwardRepo = outwardRepo;
         this.inventoryRepo = inventoryRepo;
+        this.audit = audit;
     }
 
     @Transactional
@@ -34,22 +38,26 @@ public class OutwardGatePassService {
         if (outward.getOutwardId() == null || outward.getOutwardId().isEmpty()) {
             outward.setOutwardId("OGP-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase());
         }
-
         if (outward.getDated() == null) {
             outward.setDated(LocalDate.now());
         }
-
         if (outward.getType() == null || outward.getType().isEmpty()) {
-            outward.setType(TYPE_ISSUE);
+            outward.setType(TYPE_DELIVERY);
         }
-
+        if (outward.getContractNo() == null || outward.getContractNo().isEmpty()) {
+            throw new RuntimeException("Contract No is required (stock is scoped per contract)");
+        }
         if (outward.getItems() == null || outward.getItems().isEmpty()) {
             throw new RuntimeException("At least one item is required");
         }
-
         if (outward.getCustomerName() == null || outward.getCustomerName().isEmpty()) {
             throw new RuntimeException("Customer name is required");
         }
+
+        String contractNo = outward.getContractNo();
+        String stage = "DYED".equalsIgnoreCase(outward.getFabricType())
+                ? FabricStage.DYED.name()
+                : FabricStage.GREIGH.name();
 
         for (OutwardItem item : outward.getItems()) {
             item.setOutward(outward);
@@ -66,18 +74,20 @@ public class OutwardGatePassService {
             if (item.getMeters() == null) item.setMeters(0.0);
             if (item.getRoll() == null) item.setRoll(0);
 
-            if (TYPE_RETURN.equalsIgnoreCase(outward.getType())) {
-                returnToInventory(outward.getOutwardId(), item);
-            } else {
-                deductFromInventory(item);
-            }
+            // Both DELIVERY and RETURN deduct (per business rule:
+            // "When grey/dyed is used or returned it decrements inventory").
+            deductFromInventory(contractNo, stage, item);
         }
 
-        return outwardRepo.save(outward);
+        OutwardGatePass saved = outwardRepo.save(outward);
+        audit.logCreate("OutwardGatePass", String.valueOf(saved.getId()), saved.getOutwardId(),
+                saved, "Outward gate pass " + saved.getOutwardId()
+                        + " (" + saved.getType() + ") for contract " + contractNo);
+        return saved;
     }
 
     public OutwardGatePass issue(OutwardGatePass outward) {
-        outward.setType(TYPE_ISSUE);
+        outward.setType(TYPE_DELIVERY);
         return save(outward);
     }
 
@@ -86,44 +96,33 @@ public class OutwardGatePassService {
         return save(outward);
     }
 
-    private void deductFromInventory(OutwardItem item) {
+    private void deductFromInventory(String contractNo, String stage, OutwardItem item) {
         Inventory inv = inventoryRepo
-                .findByQualityAndColorAndStage(item.getQuality(), item.getColor(), FabricStage.DYED.name())
-                .orElseGet(() -> inventoryRepo
-                        .findByQualityAndColorAndStage(item.getQuality(), item.getColor(), FabricStage.GREIGH.name())
-                        .orElseThrow(() -> new RuntimeException(
-                                "Stock not found for " + item.getQuality() + " - " + item.getColor())));
+                .findByContractNoAndQualityAndColorAndStage(contractNo, item.getQuality(), item.getColor(), stage)
+                .orElseThrow(() -> new RuntimeException(
+                        "No " + stage + " stock for contract " + contractNo
+                                + " — " + item.getQuality() + " / " + item.getColor()));
 
-        if (inv.getAvailableKg() == null || inv.getAvailableKg() < item.getKg()) {
-            throw new RuntimeException("Not enough stock for " + item.getQuality()
-                    + ". Available: " + inv.getAvailableKg());
+        double availKg = inv.getAvailableKg() == null ? 0.0 : inv.getAvailableKg();
+        double availM  = inv.getAvailableMeters() == null ? 0.0 : inv.getAvailableMeters();
+        int    availR  = inv.getAvailableRolls()  == null ? 0   : inv.getAvailableRolls();
+
+        if (availKg < item.getKg()) {
+            throw new RuntimeException("Not enough kg for " + item.getQuality()
+                    + " (avail " + availKg + ", need " + item.getKg() + ")");
+        }
+        if (item.getRoll() != null && item.getRoll() > 0 && availR < item.getRoll()) {
+            throw new RuntimeException("Not enough rolls for " + item.getQuality()
+                    + " (avail " + availR + ", need " + item.getRoll() + ")");
+        }
+        if (item.getMeters() != null && item.getMeters() > 0 && availM < item.getMeters()) {
+            throw new RuntimeException("Not enough meters for " + item.getQuality()
+                    + " (avail " + availM + ", need " + item.getMeters() + ")");
         }
 
-        inv.setAvailableKg(inv.getAvailableKg() - item.getKg());
-        if (inv.getAvailableMeters() != null && item.getMeters() != null) {
-            inv.setAvailableMeters(Math.max(0.0, inv.getAvailableMeters() - item.getMeters()));
-        }
-        inventoryRepo.save(inv);
-    }
-
-    private void returnToInventory(String refId, OutwardItem item) {
-        Inventory inv = inventoryRepo
-                .findByQualityAndColorAndStage(item.getQuality(), item.getColor(), FabricStage.DYED.name())
-                .orElse(null);
-
-        if (inv == null) {
-            inv = new Inventory();
-            inv.setRefId(refId);
-            inv.setStage(FabricStage.DYED.name());
-            inv.setQuality(item.getQuality());
-            inv.setColor(item.getColor());
-            inv.setAvailableKg(item.getKg());
-            inv.setAvailableMeters(item.getMeters());
-        } else {
-            inv.setAvailableKg((inv.getAvailableKg() == null ? 0.0 : inv.getAvailableKg()) + item.getKg());
-            inv.setAvailableMeters((inv.getAvailableMeters() == null ? 0.0 : inv.getAvailableMeters())
-                    + (item.getMeters() == null ? 0.0 : item.getMeters()));
-        }
+        inv.setAvailableKg(availKg - item.getKg());
+        inv.setAvailableRolls(availR - (item.getRoll() == null ? 0 : item.getRoll()));
+        inv.setAvailableMeters(Math.max(0.0, availM - (item.getMeters() == null ? 0.0 : item.getMeters())));
         inventoryRepo.save(inv);
     }
 

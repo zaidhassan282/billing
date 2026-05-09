@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { API_URL } from "./config";
 
 function DyedReceivePage() {
   const [form, setForm] = useState({
@@ -26,7 +27,7 @@ function DyedReceivePage() {
       shrinkage: parseFloat(form.shrinkage)
     };
 
-    fetch("http://localhost:8080/dyed/receive", {
+    fetch(`${API_URL}/dyed/receive`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

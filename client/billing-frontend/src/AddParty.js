@@ -1,8 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./AddParty.css";
 import Toast from "./Toast";
+import { API_URL } from "./config";
 
 function AddParty() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     partyCode: "",
     nameOfParty: "",
@@ -14,8 +18,39 @@ function AddParty() {
     deliveryAddress3: ""
   });
 
+  const [existingParties, setExistingParties] = useState([]);
   const [toast, setToast] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  // 🔹 Auto-generate Party ID  →  P + YY + 3-digit sequence  (e.g. P26001)
+  const generatePartyId = (existingData) => {
+    const year = new Date().getFullYear().toString().slice(-2);
+    const yearPrefix = `P${year}`;
+
+    const existingNums = existingData
+      .map(d => d.partyCode || "")
+      .filter(code => code.startsWith(yearPrefix))
+      .map(code => parseInt(code.slice(yearPrefix.length), 10) || 0);
+
+    const nextSeq = existingNums.length > 0 ? Math.max(...existingNums) + 1 : 1;
+    return `${yearPrefix}${nextSeq.toString().padStart(3, "0")}`;
+  };
+
+  // 🔹 Fetch existing parties on mount and auto-generate the next ID
+  useEffect(() => {
+    fetch(`${API_URL}/permanent-table`)
+      .then(res => res.json())
+      .then(parties => {
+        setExistingParties(parties);
+        const newId = generatePartyId(parties);
+        setFormData(prev => ({ ...prev, partyCode: newId }));
+      })
+      .catch(err => {
+        console.error(err);
+        // fallback if backend fails
+        setFormData(prev => ({ ...prev, partyCode: generatePartyId([]) }));
+      });
+  }, []);
 
   const showToast = (message, type = "success") => {
     setToast({ message, type });
@@ -23,15 +58,14 @@ function AddParty() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // 🔹 Reset everything except Party ID (regenerate it)
   const handleReset = () => {
+    const newId = generatePartyId(existingParties);
     setFormData({
-      partyCode: "",
+      partyCode: newId,
       nameOfParty: "",
       invoiceAddress: "",
       ntn: "",
@@ -40,6 +74,14 @@ function AddParty() {
       deliveryAddress2: "",
       deliveryAddress3: ""
     });
+  };
+
+  // 🔹 Duplicate check helper
+  const findDuplicate = (field, value) => {
+    if (!value) return null;
+    return existingParties.find(
+      p => p[field] && p[field].toString().toLowerCase() === value.toString().toLowerCase()
+    );
   };
 
   const handleSubmit = async (e) => {
@@ -56,22 +98,38 @@ function AddParty() {
       return;
     }
 
+    // Frontend duplicate check
+    if (findDuplicate("nameOfParty", formData.nameOfParty)) {
+      showToast(`Party Name "${formData.nameOfParty}" already exists`, "error");
+      return;
+    }
+    if (findDuplicate("ntn", formData.ntn)) {
+      showToast(`NTN "${formData.ntn}" already exists`, "error");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8080/permanent-table", {
+      const response = await fetch(`${API_URL}/permanent-table`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
       });
 
       if (response.ok) {
-        showToast("Party added successfully!", "success");
-        handleReset();
+        // Redirect to the table page with a success toast
+        navigate("/permenant-table", {
+          state: {
+            toast: {
+              message: `Party ${formData.partyCode} added successfully`,
+              type: "success"
+            }
+          }
+        });
       } else {
-        showToast("Failed to add party. Please try again.", "error");
+        const errorText = await response.text();
+        showToast(errorText || "Failed to add party", "error");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -90,7 +148,7 @@ function AddParty() {
       <div className="add-party-header">
         <div className="header-content">
           <h1>Add New Party</h1>
-          <p>Create a new party entry in the permanent party table</p>
+          <p>Create a new party entry · Party ID is auto-generated</p>
         </div>
       </div>
 
@@ -103,15 +161,21 @@ function AddParty() {
             <h3>Basic Information</h3>
             <div className="form-grid">
               <div className="form-group">
-                <label htmlFor="partyCode">Party Code</label>
+                <label htmlFor="partyCode">Party ID <span className="required">*</span> <small style={{ color: "#888", fontWeight: 400 }}>(auto-generated)</small></label>
                 <input
                   type="text"
                   id="partyCode"
                   name="partyCode"
                   value={formData.partyCode}
-                  onChange={handleChange}
-                  placeholder="Enter party code"
-                  disabled={isLoading}
+                  readOnly
+                  style={{
+                    backgroundColor: "#eef2ff",
+                    fontWeight: 700,
+                    color: "#1e3a8a",
+                    letterSpacing: "0.5px",
+                    cursor: "not-allowed"
+                  }}
+                  title="Auto-generated unique Party ID"
                 />
               </div>
 
@@ -225,15 +289,24 @@ function AddParty() {
               className="btn-submit"
               disabled={isLoading}
             >
-              {isLoading ? "Adding..." : "Add Party"}
+              {isLoading ? "Adding..." : "Submit"}
             </button>
             <button
-              type="reset"
+              type="button"
               className="btn-reset"
               onClick={handleReset}
               disabled={isLoading}
             >
               Clear Form
+            </button>
+            <button
+              type="button"
+              className="btn-reset"
+              onClick={() => navigate("/permenant-table")}
+              disabled={isLoading}
+              style={{ marginLeft: "auto" }}
+            >
+              ← Back to Table
             </button>
           </div>
 

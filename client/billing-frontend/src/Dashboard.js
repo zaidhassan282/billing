@@ -34,47 +34,30 @@ function Dashboard() {
           <div className="cards-grid">
 
             <Card
-              icon="➕"
-              title="Add Party"
-              description="Add new party to permanent table"
-              onClick={() => navigate("/add-party")}
-            />
-            <Card
               icon="📑"
               title="Permanent Table"
               description="Permanent entries and records"
               onClick={() => navigate("/permenant-table")}
             />
-            <Card
-              icon="🧾"
-              title="Invoice"
-              description="Create and manage invoices"
-              onClick={() => navigate("/invoice")}
-            />
-            <Card
-              icon="📋"
-              title="Contract"
-              description="Create and manage contracts"
-              onClick={() => navigate("/contract")}
-            />
+
             <Card
               icon="📊"
               title="Contract Table"
               description="View and manage sales contracts"
-              onClick={() => navigate("/contracts")}
+              onClick={() => navigate("/contract-table")}
             />
 
             <Card
               icon="🎫"
               title="Inward Gate Pass"
               description="Receive greigh material"
-              onClick={() => navigate("/inward-page")}
+              onClick={() => navigate("/inward-entry")}
             />
             <Card
               icon="📤"
               title="Outward Gate Pass"
               description="Issue/return materials to customers"
-              onClick={() => navigate("/outward-gatepass")}
+              onClick={() => navigate("/outward-entry")}
             />
             <Card
               icon="🏭"
@@ -90,6 +73,13 @@ function Dashboard() {
             />
 
             <Card
+              icon="📋"
+              title="Orders"
+              description="Track dyed orders through delivery"
+              onClick={() => navigate("/orders")}
+            />
+
+            <Card
               icon="📦"
               title="Inventory"
               description="Manage grey and dyed fabric inventory"
@@ -102,10 +92,23 @@ function Dashboard() {
               onClick={() => navigate("/receipts")}
             />
             <Card
+              icon="🧾"
+              title="Invoice"
+              description="Create and manage invoices"
+              onClick={() => navigate("/invoice")}
+            />
+            <Card
               icon="🔖"
               title="Greigh Receipt"
               description="Greigh receipt management"
               onClick={() => navigate("/griegh-receipts")}
+            />
+
+            <Card
+              icon="📜"
+              title="Logs"
+              description="Audit trail of every system change"
+              onClick={() => navigate("/logs")}
             />
 
           </div>

@@ -20,16 +20,16 @@ public class DyeingController {
 
     @PostMapping("/issue")
     public IssueToDyeing issue(@RequestBody IssueRequest req) {
-        return service.issue(
-                req.getQuality(),
-                req.getColor(),
-                req.getQtyKg(),
-                req.resolveInwardRef()
-        );
+        return service.issue(req);
     }
 
     @GetMapping("/issues")
     public List<IssueToDyeing> getAll() {
         return service.getAll();
+    }
+
+    @GetMapping("/issues/by-contract/{contractNo}")
+    public List<IssueToDyeing> getByContract(@PathVariable String contractNo) {
+        return service.getByContract(contractNo);
     }
 }

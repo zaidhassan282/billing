@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { API_URL } from "./config";
 
 function DailyEntries() {
   const [entries, setEntries] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/entries")
+    fetch(`${API_URL}/entries`)
       .then(res => res.json())
       .then(setEntries)
       .catch(() => setEntries([]));

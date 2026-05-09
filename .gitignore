@@ -1,0 +1,19 @@
+# IDE / editor state
+.claude/
+.vscode/
+.idea/
+*.iml
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+**/target/
+**/build/
+**/node_modules/
+
+# Local env
+*.local
+.env.local

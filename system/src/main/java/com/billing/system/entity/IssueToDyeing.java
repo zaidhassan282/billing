@@ -15,8 +15,10 @@ public class IssueToDyeing {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
-    private String issueId; // DY-xxxxxx
+    @Column(unique = true, length = 32)
+    private String issueId; // ITD26001
+
+    private String contractNo;
 
     private String inwardId;
 
@@ -26,5 +28,12 @@ public class IssueToDyeing {
 
     private Double quantityKg;
 
+    private Integer quantityRolls;
+
+    private Double quantityMeters;
+
     private LocalDate date;
+
+    @Column(length = 512)
+    private String remarks;
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import { API_URL } from "./config";
 
 const downloadPDF = () => {
     const input = document.getElementById("invoice");
@@ -21,7 +22,7 @@ function Invoice() {
     const [data, setData] = useState(null);
 
     useEffect(() => {
-        fetch("http://localhost:8080/entries/1")
+        fetch(`${API_URL}/entries/1`)
             .then(res => res.json())
             .then(setData)
             .catch(console.error);
